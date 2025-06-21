@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateStart, updateSuccess, updateFailure } from "../redux/user/userSlice.js";
+import { updateStart, updateSuccess, updateFailure, deleteStart, deleteFailure } from "../redux/user/userSlice.js";
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
   const [formData,setFormData] = useState({});
   const dispatch = useDispatch();
   const [updateUserSuccess,setUpdateUserSuccess] = useState(null);
   const [updateUserError,setUpdateUserError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleChange = (e) =>{
     setFormData({ ...formData, [e.target.id]: e.target.value})
@@ -43,6 +45,26 @@ function DashProfile() {
     }catch(error){
       dispatch(updateFailure(error.message));
       setUpdateUserError(error.message);
+    }
+  }
+
+  const handleDelete = async(e) =>{
+    setShowModal(false);
+
+    try{
+      dispatch(deleteStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
+        method: 'DELETE'
+      })
+
+      const data = await res.json();
+      if(!res.ok){
+        dispatch(deleteFailure(data.message));
+      }else{
+        dispatch(deleteSuccess(data));
+      }
+    }catch(error){
+      dispatch(deleteFailure(error.message));
     }
   }
   
@@ -86,7 +108,9 @@ function DashProfile() {
         </button>
       </form>
       <div className="text-red-500 flex justify-between mt-5">
-        <span className="cursor-pointer">Delete Account?</span>
+        <span onClick={() => setShowModal(true)} className="cursor-pointer">
+          Delete Account?
+        </span>
         <span className="cursor-pointer">SignOut</span>
       </div>
       {updateUserSuccess && (
@@ -97,6 +121,37 @@ function DashProfile() {
       {updateUserError && (
         <div className="mt-5 p-4 text-red-800 bg-red-100 border border-red-400 rounded-md">
           {updateUserError}
+        </div>
+      )}
+      {error && (
+        <div className="mt-5 p-4 text-red-800 bg-red-100 border border-red-400 rounded-md">
+          {error}
+        </div>
+      )}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="text-center">
+              <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+              <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
+                Are you sure you want to delete your account?
+              </h3>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={handleDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                >
+                  Yes, I'm sure
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+                >
+                  No, cancel
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
