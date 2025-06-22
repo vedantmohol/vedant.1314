@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateStart, updateSuccess, updateFailure, deleteStart, deleteFailure } from "../redux/user/userSlice.js";
+import { updateStart, updateSuccess, updateFailure, deleteStart, deleteFailure, signOutSuccess, deleteSuccess } from "../redux/user/userSlice.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 function DashProfile() {
@@ -48,7 +48,7 @@ function DashProfile() {
     }
   }
 
-  const handleDelete = async(e) =>{
+  const handleDelete = async() =>{
     setShowModal(false);
 
     try{
@@ -65,6 +65,24 @@ function DashProfile() {
       }
     }catch(error){
       dispatch(deleteFailure(error.message));
+    }
+  }
+
+  const handleSignout = async() =>{
+    try{
+      const res = await fetch('/api/auth/signout',{
+        method: 'POST'
+      });
+
+      const data = await res.json();
+
+      if(!res.ok){
+        console.log(data.message);
+      }else{
+        dispatch(signOutSuccess());
+      }
+    }catch(error){
+      console.log(error.message);
     }
   }
   
@@ -111,7 +129,7 @@ function DashProfile() {
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account?
         </span>
-        <span className="cursor-pointer">SignOut</span>
+        <span onClick={handleSignout} className="cursor-pointer">SignOut</span>
       </div>
       {updateUserSuccess && (
         <div className="mt-5 p-4 text-green-800 bg-green-100 border border-green-400 rounded-md">
