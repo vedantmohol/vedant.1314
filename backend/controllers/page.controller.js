@@ -1,5 +1,17 @@
 import Page from "../models/page.model.js";
 
+export const getPageContent = async (req, res, next) => {
+  try {
+    let page = await Page.findOne(); 
+    if (!page) {
+      page = await Page.create({}); 
+    }
+    res.status(200).json(page);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const updateHome = async (req, res,next) => {
   try {
     const { image, text, pdf } = req.body;
