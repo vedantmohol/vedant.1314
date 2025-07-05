@@ -5,6 +5,7 @@ import { app } from "../Firebase.js";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { updatePageFailure, updatePageStart, updatePageSuccess } from "../redux/page/pageSlice.js";
+import { FaTwitter, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa';
 
 function Home() {
   const { currentUser } = useSelector((state) => state.user);
@@ -21,6 +22,8 @@ function Home() {
   const [formData, setFormData] = useState({});
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [pageData, setPageData] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -137,6 +140,29 @@ function Home() {
     }
   };
 
+  useEffect(() => {
+    const fetchPageData = async () => {
+      try {
+        const res = await fetch("/api/pages");
+
+        if (!res.ok) {
+          throw new Error("Failed to load page content");
+        }
+
+        const data = await res.json();
+
+        setPageData(data.home);
+      } catch (error) {
+        setFetchError(
+          error.message || "Something went wrong while loading the page."
+        );
+      }
+    };
+    if (!isAdmin) {
+      fetchPageData();
+    }
+  }, [isAdmin]);
+
   return (
     <div className="min-h-screen mt-20">
       {isAdmin ? (
@@ -249,7 +275,81 @@ function Home() {
           )}
         </div>
       ) : (
-        <div></div>
+        <div className="flex p-3 max-w-5xl mx-auto flex-col-reverse md:flex-row md:items-center gap-5">
+          <div className="flex-1 mt-15 text-center md:text-left">
+            <h2 className="font-semibold text-3xl">
+              Hello, Myself{" "}
+              <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Vedant
+              </span>
+            </h2>
+            {pageData?.text && <p className="text-xl mt-5">{pageData.text}</p>}
+
+            <div className="flex justify-center md:justify-start gap-4 mt-4 mb-6">
+              <a
+                href="https://x.com/vedant_1314?t=uavg3rF6Isg0SiHHDd0o-Q&s=08"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full p-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-110 transition"
+              >
+                <FaTwitter size={20} />
+              </a>
+              <a
+                href="https://www.instagram.com/vedant.1314"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full p-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-110 transition"
+              >
+                <FaInstagram size={20} />
+              </a>
+              <a
+                href="https://github.com/vedantmohol"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full p-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-110 transition"
+              >
+                <FaGithub size={20} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/vedant-mohol-a79613271"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full p-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:scale-110 transition"
+              >
+                <FaLinkedin size={20} />
+              </a>
+            </div>
+
+            {pageData?.pdf && (
+              <button className="bg-gradient-to-r mt-3 from-purple-500 to-blue-500 text-white py-2 px-4 rounded hover:opacity-90 disabled:opacity-50">
+                <a
+                  href={pageData.pdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View My Resume
+                </a>
+              </button>
+            )}
+          </div>
+
+          {pageData?.image && (
+            <div className="flex-1 flex justify-center">
+              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 rounded-full">
+                <img
+                  src={pageData.image}
+                  alt="Vedant"
+                  className="rounded-full w-64 h-64 object-cover bg-white"
+                />
+              </div>
+            </div>
+          )}
+          {fetchError && (
+            <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 max-w-2xl mx-auto">
+              {fetchError}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
