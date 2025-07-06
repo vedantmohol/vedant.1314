@@ -44,3 +44,18 @@ export const updateAbout = async (req, res) => {
     res.status(500).json({ message: 'Failed to update about content' });
   }
 };
+
+export const updateServices = async (req, res) => {
+  try {
+    const { list } = req.body; 
+    let page = await Page.findOne();
+    if (!page) page = await Page.create({});
+
+    if (Array.isArray(list)) page.services.list = list;
+
+    await page.save();
+    res.status(200).json(page.services);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update services' });
+  }
+};
