@@ -8,7 +8,7 @@ function Header() {
   };
 
   return (
-    <nav className="border-b-2 flex flex-wrap justify-between items-center p-4 scroll-smooth">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 flex flex-wrap justify-between items-center p-4 shadow-md">
       <div className="flex font-semibold">
         <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
           Portfolio
