@@ -28,3 +28,19 @@ export const updateHome = async (req, res,next) => {
     next(err)
   }
 };
+
+export const updateAbout = async (req, res) => {
+  try {
+    const { image, text } = req.body;
+    let page = await Page.findOne();
+    if (!page) page = await Page.create({});
+
+    if (image !== undefined) page.about.image = image;
+    if (text !== undefined) page.about.text = text;
+
+    await page.save();
+    res.status(200).json(page.about);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update about content' });
+  }
+};
