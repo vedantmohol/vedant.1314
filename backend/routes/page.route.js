@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPageContent, updateAbout, updateHome, updateServices } from '../controllers/page.controller.js';
+import { getPageContent, updateAbout, updateHome, updateProjects, updateServices } from '../controllers/page.controller.js';
 
 const router = express.Router();
 
@@ -7,5 +7,6 @@ router.get('/',getPageContent);
 router.put('/home',updateHome);
 router.put('/about', updateAbout);
 router.put('/services', updateServices);
+router.put('/projects',updateProjects);
 
 export default router;

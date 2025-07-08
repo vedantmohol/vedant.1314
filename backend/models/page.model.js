@@ -27,8 +27,11 @@ const projectSchema = new mongoose.Schema({
     image: {
         type: String,
         required: true,
+    },
+    link: {
+        type: String,
     }
-})
+});
 
 const pageSchema = new mongoose.Schema({
     home:{
