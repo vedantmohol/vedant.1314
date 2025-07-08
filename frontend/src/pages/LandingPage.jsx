@@ -2,6 +2,7 @@ import React from 'react';
 import Home from './Home.jsx'; 
 import About from './About.jsx'; 
 import Services from './Services.jsx';
+import Projects from './Projects.jsx';
 
 function LandingPage() {
   return (
@@ -16,6 +17,10 @@ function LandingPage() {
 
       <section id="skills" className='md:scroll-mt-20 min-h-screen flex items-center justify-center'>
         <Services />
+      </section>
+
+      <section id="projects" className='md:scroll-mt-20 min-h-screen flex items-center justify-center'>
+        <Projects/>
       </section>
     </main>
   );
