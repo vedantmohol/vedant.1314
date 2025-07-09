@@ -74,3 +74,19 @@ export const updateProjects = async (req, res) => {
     res.status(500).json({ message: 'Failed to update projects'});
   }
 };
+
+export const updateContact = async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+    let page = await Page.findOne();
+    if (!page) page = await Page.create({});
+
+    if (email !== undefined) page.contact.email = email;
+    if (phone !== undefined) page.contact.phone = phone;
+
+    await page.save();
+    res.status(200).json(page.contact);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update contact content' });
+  }
+};
