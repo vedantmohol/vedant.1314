@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from 'jsonwebtoken';
+import { sendEmail } from "../utils/emailSender.js";
 
 export const signUp = async(req,res,next) =>{
     const { username, password, email } = req.body;
@@ -66,3 +67,38 @@ export const signOut = async(req,res,next) =>{
         next(err);
     }
 }
+
+const otpStore = new Map(); 
+
+export const sendOTP = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  otpStore.set(email, otp);
+  setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
+
+  try {
+    await sendEmail(
+      email,
+      "Your OTP for Contact Verification",
+      `Your OTP is: ${otp}`
+    );
+
+    res.status(200).json({ message: "OTP sent to email successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to send OTP." });
+  }
+};
+
+export const verifyOTP = (req, res) => {
+  const { email, otp } = req.body;
+  const storedOtp = otpStore.get(email);
+  if (storedOtp && storedOtp === otp) {
+    otpStore.delete(email); 
+    res.status(200).json({ message: "OTP verified successfully.", verified: true });
+  } else {
+    res.status(400).json({ message: "Invalid OTP." });
+  }
+};
