@@ -23,11 +23,12 @@ function Contact() {
   const [adminForm, setAdminForm] = useState({ email: "", phone: "" });
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
 
   useEffect(() => {
     const fetchContact = async () => {
       try {
-        const res = await fetch("/api/pages/");
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages/`);
         const data = await res.json();
         setPageData(data.contact || {});
         setContactInfo(data.contact || {});
@@ -54,7 +55,7 @@ function Contact() {
 
     try {
       dispatch(updatePageStart());
-      const res = await fetch("/api/pages/contact", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages/contact`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(adminForm),
@@ -80,7 +81,7 @@ function Contact() {
     }
     setSendingOtp(true);
     try {
-      const res = await fetch("/api/auth/send-otp", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
@@ -100,8 +101,9 @@ function Contact() {
   };
 
   const verifyOtp = async () => {
+    setVerifyingOtp(true);
     try {
-      const res = await fetch("/api/auth/verify-otp", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email, otp }),
@@ -115,7 +117,9 @@ function Contact() {
       }
     } catch (err) {
       setStatus("Verification failed");
-    }
+    } finally {
+      setVerifyingOtp(false); 
+  }
   };
 
   const handleSubmit = async (e) => {
@@ -125,7 +129,7 @@ function Contact() {
     }
     setSendingMessage(true);
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch(`https://api.web3forms.com/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -152,10 +156,14 @@ function Contact() {
     <section className="min-h-screen pt-20 px-6 max-w-5xl mx-auto">
       <h2 className="text-5xl font-bold mb-4 text-center">
         Contact
-        <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"> Me</span>
+        <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+          {" "}
+          Me
+        </span>
       </h2>
       <p className="text-center text-gray-600 max-w-2xl mx-auto mb-6">
-        Feel free to reach out for any collaborations or inquiries. I'm always open to new opportunities!
+        Feel free to reach out for any collaborations or inquiries. I'm always
+        open to new opportunities!
       </p>
 
       <div className="flex justify-center mt-5 gap-4">
@@ -190,7 +198,10 @@ function Contact() {
       </div>
 
       {isAdmin ? (
-        <form onSubmit={handleAdminSubmit} className="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto space-y-4">
+        <form
+          onSubmit={handleAdminSubmit}
+          className="bg-white shadow-md rounded-lg p-6 max-w-xl mx-auto space-y-4"
+        >
           <input
             type="email"
             name="email"
@@ -216,24 +227,72 @@ function Contact() {
           >
             {loading ? "Saving..." : "Save Contact Info"}
           </button>
-          {successMsg && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">{successMsg}</div>}
-          {errorMsg && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">{errorMsg}</div>}
+          {successMsg && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded">
+              {successMsg}
+            </div>
+          )}
+          {errorMsg && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+              {errorMsg}
+            </div>
+          )}
         </form>
       ) : (
-        <form onSubmit={handleSubmit} className="mt-5 bg-white p-6 shadow-lg rounded-md max-w-xl mx-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-5 bg-white p-6 shadow-lg rounded-md max-w-xl mx-auto"
+        >
           <h3 className="text-xl font-semibold mb-4">Send a Message</h3>
 
-          <input type="text" name="name" placeholder="Your Name" value={formData.name} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded mb-4" required />
+          <input
+            type="text"
+            name="name"
+            placeholder="Your Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded mb-4"
+            required
+          />
 
           <div className="flex gap-2">
-            <input type="email" name="email" placeholder="Your Email" value={formData.email} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded mb-4" required disabled={otpSent || otpVerified} />
+            <input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded mb-4"
+              required
+              disabled={otpSent || otpVerified}
+            />
             {!otpVerified && (
-              <button type="button" onClick={sendOtp} className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 rounded mb-4 flex items-center justify-center gap-2" disabled={sendingOtp}>
+              <button
+                type="button"
+                onClick={sendOtp}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 rounded mb-4 flex items-center justify-center gap-2"
+                disabled={sendingOtp}
+              >
                 {sendingOtp ? (
                   <>
-                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
                     </svg>
                     Sending...
                   </>
@@ -246,19 +305,69 @@ function Contact() {
 
           {otpSent && !otpVerified && (
             <div className="mb-4">
-              <input type="text" placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} className="w-full p-3 border border-gray-300 rounded mb-2" />
-              <button type="button" onClick={verifyOtp} className="bg-green-500 text-white px-4 rounded">Verify OTP</button>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded mb-2"
+              />
+              <button
+                type="button"
+                onClick={verifyOtp}
+                className="bg-green-500 text-white px-4 py-2 rounded flex items-center justify-center gap-2"
+                disabled={verifyingOtp}
+              >
+                {verifyingOtp ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify OTP"
+                )}
+              </button>
             </div>
           )}
 
-          <textarea name="message" placeholder="Your Message" rows="5" value={formData.message} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded mb-4" required></textarea>
+          <textarea
+            name="message"
+            placeholder="Your Message"
+            rows="5"
+            value={formData.message}
+            onChange={handleChange}
+            className="w-full p-3 border border-gray-300 rounded mb-4"
+            required
+          ></textarea>
 
-          <button type="submit" className="bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 px-6 rounded hover:opacity-90" disabled={sendingMessage}>
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 px-6 rounded hover:opacity-90"
+            disabled={sendingMessage}
+          >
             {sendingMessage ? (
               <>
-                <svg className="animate-spin h-5 w-5 text-white inline-block mr-2" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                <svg
+                  className="animate-spin h-5 w-5 text-white inline-block mr-2"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
                 </svg>
                 Sending...
               </>
@@ -267,7 +376,11 @@ function Contact() {
             )}
           </button>
 
-          {status && <p className="mt-4 text-center text-green-600 font-medium">{status}</p>}
+          {status && (
+            <p className="mt-4 text-center text-green-600 font-medium">
+              {status}
+            </p>
+          )}
         </form>
       )}
     </section>

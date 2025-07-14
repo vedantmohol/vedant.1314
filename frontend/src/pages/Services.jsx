@@ -16,7 +16,7 @@ function Services() {
 
   const fetchServices = async () => {
     try {
-      const res = await fetch("/api/pages");
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages`);
       const data = await res.json();
       const list = data?.services?.list || [];
 
@@ -67,7 +67,7 @@ function Services() {
 
     try {
       dispatch(updatePageStart());
-      const res = await fetch("/api/pages/services", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages/services`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

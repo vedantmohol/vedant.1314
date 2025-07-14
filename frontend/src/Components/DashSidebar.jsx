@@ -17,7 +17,7 @@ function DashSidebar() {
 
   const handleSignout = async(e) =>{
     try{
-      const res = await fetch('/api/auth/signout', {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signout`, {
         method : 'POST',
       });
 

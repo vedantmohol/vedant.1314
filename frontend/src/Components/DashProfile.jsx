@@ -27,7 +27,7 @@ function DashProfile() {
 
     try{
       dispatch(updateStart());
-      const res = await fetch(`/api/user/update/${currentUser._id}`,{
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/update/${currentUser._id}`,{
         method: 'PUT',
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify(formData)
@@ -53,7 +53,7 @@ function DashProfile() {
 
     try{
       dispatch(deleteStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/user/delete/${currentUser._id}`,{
         method: 'DELETE'
       })
 
@@ -70,7 +70,7 @@ function DashProfile() {
 
   const handleSignout = async() =>{
     try{
-      const res = await fetch('/api/auth/signout',{
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/signout`,{
         method: 'POST'
       });
 

@@ -91,7 +91,7 @@ function About() {
 
     try {
       dispatch(updatePageStart());
-      const res = await fetch("/api/pages/about", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages/about`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +116,7 @@ function About() {
   useEffect(() => {
     const fetchPageData = async () => {
       try {
-        const res = await fetch("/api/pages");
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages`);
 
         if (!res.ok) {
           throw new Error("Failed to load page content");

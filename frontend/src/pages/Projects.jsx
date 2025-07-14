@@ -20,7 +20,7 @@ function Projects() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch("/api/pages");
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages`);
       const data = await res.json();
       setProjects(data?.projects?.list || []);
       setInputFields(data?.projects?.list || []);
@@ -93,7 +93,7 @@ function Projects() {
 
     try {
       dispatch(updatePageStart());
-      const res = await fetch("/api/pages/projects", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/pages/projects`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
